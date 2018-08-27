@@ -1,0 +1,30 @@
+#include <windows.h>
+#include <commctrl.h>
+#include <richedit.h>
+
+#define VERSIONINFO_1  1
+#define ICON_1 1
+
+LANGUAGE 25, SUBLANG_DEFAULT
+
+VERSIONINFO_1  VERSIONINFO
+FILEVERSION    0, 0, 0, 1
+FILEOS         VOS_NT_WINDOWS32
+FILETYPE       VFT_APP
+{
+    BLOCK "StringFileInfo"
+    {
+        BLOCK "041904E3"
+        {
+            VALUE "OriginalFilename", "Marklar.exe"
+        }
+    }
+
+    BLOCK "VarFileInfo"
+    {
+        VALUE "Translation", 0x0419, 0x04E3
+    }
+}
+
+ICON_1 ICON "icon.ico"
+
