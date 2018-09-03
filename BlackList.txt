@@ -4,3 +4,5 @@ build-[^\-]+-Desktop_Qt_[0-9]+_[0-9]+_[0-9]+_[^_]+_[^\-]+-(Release|Debug)
 
 \.pro\.user$
 \.o$
+\.bak$
+\.tmp$
