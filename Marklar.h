@@ -52,6 +52,7 @@ class Marklar : public QObject {
 private:
     QString _source_path;
     QString _target_path;
+    QStringList _black_list;
 
     QMenu * _menu;
     QSystemTrayIcon * _tray;
@@ -59,7 +60,9 @@ private:
     typedef enum { TrayIdle, TrayFailed, TrayActive } TrayIcon;
     QMap<TrayIcon,QIcon> _icon_map;
 public:
-    Marklar(const QString & source_path,const QString & target_path,const int update_mins = 60,QObject * parent = NULL);
+    Marklar(const QString & source_path,const QString & target_path,
+            const int update_mins = 60,const QString & black_list_fn = "BlackList.txt",
+            QObject * parent = NULL);
     ~Marklar(void);
 public slots:
     void browseTargetPath(void);

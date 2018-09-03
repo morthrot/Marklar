@@ -41,12 +41,26 @@ along with Composer.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Hive.h"
 
-Marklar::Marklar(const QString & source_path,const QString & target_path,const int update_mins,QObject * parent) : QObject(parent) {
+Marklar::Marklar(const QString & source_path,const QString & target_path,const int update_mins,const QString & black_list_fn,QObject * parent) : QObject(parent) {
     _source_path = source_path;
     _target_path = target_path;
 
     if(_source_path.isEmpty() == false && _source_path.endsWith("/") == false) { _source_path += "/"; }
     if(_target_path.isEmpty() == false && _target_path.endsWith("/") == false) { _target_path += "/"; }
+
+    QFile black_list_file(black_list_fn);
+    if(black_list_file.open(QIODevice::ReadOnly) == true) {
+        while(black_list_file.atEnd() == false) {
+            QString line = QString::fromUtf8(black_list_file.readLine()).trimmed();
+            if(line.isEmpty() == true) { continue; }
+            if(line.startsWith("#") == true) { continue; }
+
+            if(_black_list.contains(line) == true) { continue; }
+            else { _black_list.append(line); }
+            }
+
+        black_list_file.close();
+        }
 
     _icon_map[TrayIdle] = QIcon(":/idle.png");
     _icon_map[TrayFailed] = QIcon(":/failed.png");
@@ -70,10 +84,11 @@ Marklar::Marklar(const QString & source_path,const QString & target_path,const i
     connect(timer,SIGNAL(timeout()),this,SLOT(keepAlive()));
     timer->start(effective_mins * 60 * 1000);
 
-    trayMessage( QString("Запуск архивирования \"%1\" в \"%2\" каждые %3 минут(а,ы)")
+    trayMessage( QString("Запуск архивирования \"%1\" в \"%2\" каждые %3 минут(а,ы), %4 правил(о,а) фильтрации")
                  .arg( QDir::toNativeSeparators(_source_path) )
                  .arg( QDir::toNativeSeparators(_target_path) )
-                 .arg( effective_mins ) );
+                 .arg( effective_mins )
+                 .arg( _black_list.count() ) );
 
     QTimer::singleShot(4096,this,SLOT(keepAlive()));
     }
@@ -121,6 +136,24 @@ bool Marklar::keepAlive(void) {
     changed_files.append( source_hive.removedFiles(target_hive) );
 
     if(changed_files.isEmpty() == false) {
+        unsigned int filtered_count = 0;
+
+        if(_black_list.isEmpty() == false) {
+            QStringList filtered_files = changed_files;
+
+            for(int i=0; i<filtered_files.count(); i++) {
+                QString filtered_file = filtered_files.at(i);
+
+                for(int x=0; x<_black_list.count(); x++) {
+                    QRegExp filter_rx(_black_list.at(x));
+                    if(filter_rx.indexIn(filtered_file) == -1) { continue; }
+
+                    changed_files.removeAll(filtered_file);
+                    filtered_count++;
+                    }
+                }
+            }
+
         QString backup_folder = _target_path + QDateTime::currentDateTime().toString("yyyy-MM-dd_HH-mm-ss/");
         if(QDir(backup_folder).mkpath(".") == false) {
             trayIcon(TrayFailed);
@@ -137,7 +170,7 @@ bool Marklar::keepAlive(void) {
 
             if(QFile::copy(source_fn,target_fn) == false) {
                 trayIcon(TrayFailed);
-                trayMessage( QString("Ошибка копирования \"%1\" в \"%2\"")
+                trayMessage( QString("Ошибка архивирования \"%1\" в \"%2\"")
                              .arg( QDir::toNativeSeparators(source_fn) )
                              .arg( QDir::toNativeSeparators(target_fn) ),
                              true );
@@ -145,7 +178,9 @@ bool Marklar::keepAlive(void) {
                 }
             }
 
-        trayMessage( QString("Сохранено %1 файл(а,ов)").arg(changed_files.count()) );
+        trayMessage( QString("Архивировано %1 файл(а,ов), проигнорировано %2 файл(а,ов)")
+                     .arg( changed_files.count() )
+                     .arg( filtered_count ) );
         }
 
     if(source_hive.save(hive_fn) == false) {
@@ -159,7 +194,7 @@ bool Marklar::keepAlive(void) {
     }
 
 void Marklar::trayMessage(const QString & text,bool fatal) {
-    _tray->showMessage("Marklar",text,fatal ? QSystemTrayIcon::Critical : QSystemTrayIcon::Information, 2048);
+    _tray->showMessage("Marklar", text, fatal ? QSystemTrayIcon::Critical : QSystemTrayIcon::Information, 2048);
     }
 
 void Marklar::trayIcon(const TrayIcon & icon) {

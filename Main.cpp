@@ -57,15 +57,16 @@ int main(int argc, char *argv[]) {
 
     if(args.count() < 3) {
         QString app_name = QDir::fromNativeSeparators(args.at(0)).split("/",QString::SkipEmptyParts).last();
-        QMessageBox::critical(NULL,"Параметры запуска",QString("<b>%1</b> &lt;исходный путь&gt; &lt;путь архивов&gt; [интервал, мин]").arg(app_name),"Выход");
+        QMessageBox::critical(NULL,"Параметры запуска",QString("<b>%1</b> &lt;исходный путь&gt; &lt;путь архивов&gt; [интервал, мин] [имя файла исключений]").arg(app_name),"Выход");
         return EXIT_FAILURE;
         }
 
     QString source_path = QDir::fromNativeSeparators(args.at(1));
     QString target_path = QDir::fromNativeSeparators(args.at(2));
     int update_mins = args.count() > 3 ? args.at(3).toInt() : 60;
+    QString black_list_fn = args.count() > 4 ? QDir::fromNativeSeparators(args.at(4)) : "BlackList.txt";
 
-    Marklar marklar(source_path,target_path,update_mins);
+    Marklar marklar(source_path,target_path,update_mins,black_list_fn);
 
     return app.exec();
     return EXIT_SUCCESS;
