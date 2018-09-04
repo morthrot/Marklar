@@ -29,4 +29,3 @@ MOC_DIR			= .temp
 UI_DIR			= .temp
 UI_HEADERS_DIR		= .temp
 UI_SOURCES_DIR		= .temp
-

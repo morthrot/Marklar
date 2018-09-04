@@ -52,7 +52,7 @@ class Marklar : public QObject {
 private:
     QString _source_path;
     QString _target_path;
-    QStringList _black_list;
+    QString _black_list_fn;
 
     QMenu * _menu;
     QSystemTrayIcon * _tray;

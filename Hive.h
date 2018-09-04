@@ -46,12 +46,15 @@ class Hive : public QObject {
     Q_OBJECT
 private:
     QMap<QString,QByteArray> _contents;
+    QSet<QRegExp> _exceptions;
     QString _last_error;
 public:
     Hive(QObject * parent = NULL);
-    ~Hive(void);
 public slots:
     QString lastError(void);
+
+    bool loadExceptions(const QString & fn);
+    bool matchException(const QString & text);
 
     bool load(const QString & fn);
     bool save(const QString & fn);

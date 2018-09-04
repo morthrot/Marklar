@@ -41,14 +41,40 @@ along with Composer.  If not, see <http://www.gnu.org/licenses/>.
 
 Hive::Hive(QObject * parent) : QObject(parent) {
     _contents.clear();
+    _exceptions.clear();
     _last_error.clear();
-    }
-
-Hive::~Hive(void) {
     }
 
 QString Hive::lastError(void) {
     return _last_error;
+    }
+
+bool Hive::loadExceptions(const QString & fn) {
+    if(fn.isEmpty() == true) { return false; }
+
+    QFile file(fn);
+    if(file.open(QIODevice::ReadOnly) == false) {
+        _last_error = QString("Ошибка открытия файла исключений \"%1\" для чтения").arg( QDir::toNativeSeparators(fn) );
+        return false;
+        }
+
+    _exceptions.clear();
+    while(file.atEnd() == false) {
+        QString line = QString::fromUtf8(file.readLine()).trimmed();
+        if(line.isEmpty() == true) { continue; }
+        if(line.startsWith("#") == true) { continue; }
+
+        _exceptions.insert( QRegExp(line) );
+        }
+
+    file.close();
+    return true;
+    }
+
+bool Hive::matchException(const QString & text) {
+    if(text.isEmpty() == true) { return false; }
+    Q_FOREACH(const QRegExp &rx, _exceptions) { if(rx.indexIn(text) != -1) { return true; } }
+    return false;
     }
 
 bool Hive::load(const QString & fn) {
@@ -92,6 +118,8 @@ void Hive::clear(void) {
 bool Hive::appendFolderToHive(QString base_name,QString folder_name) {
     if(base_name.isEmpty() == true) { return false; }
 
+    if(matchException(folder_name) == true) { return true; }
+
     if(base_name.endsWith('/') == false) { base_name = base_name.append('/'); }
     if(folder_name.isEmpty() == false && folder_name.endsWith('/') == false) { folder_name = folder_name.append('/'); }
 
@@ -120,6 +148,8 @@ bool Hive::appendFolderToHive(QString base_name,QString folder_name) {
 
 bool Hive::appendFileToHive(const QString & base_name,const QString & file_name) {
     if(file_name.isEmpty() == true) { return false; }
+
+    if(matchException(file_name) == true) { return true; }
 
     if(_contents.contains(file_name) == true) {
         _last_error = QString("Дублирующееся имя файла \"%1\"").arg( (QDir::toNativeSeparators(file_name)) );
