@@ -70,6 +70,7 @@ Marklar::Marklar(const QString & source_path,const QString & target_path,const i
     _menu->addAction("Показать архив",this,SLOT(browseTargetPath()));
     _menu->addAction("Архивировать сейчас",this,SLOT(keepAlive()));
     _menu->addSeparator();
+    _menu->addAction("О программе...",this,SLOT(performAboutDialog()));
     _menu->addAction("Выход...",this,SLOT(performExitSyncDialog()));
 
     _tray = new QSystemTrayIcon(this);
@@ -193,8 +194,25 @@ bool Marklar::keepAlive(void) {
     return true;
     }
 
+void Marklar::performAboutDialog(void) {
+    QMessageBox box;
+    box.setWindowTitle("О программе");
+    box.setIcon(QMessageBox::Information);
+    box.setText("Программа резервного копирования <b>\"Marklar\"</b>");
+    box.setInformativeText("Copyright (c) 2018 Д.С. Андреев");
+
+    QFile license_file(":/LICENSE");
+    if(license_file.open(QIODevice::ReadOnly) == true) {
+        box.setDetailedText( QString::fromUtf8(license_file.readAll()) );
+        license_file.close();
+        }
+
+    box.exec();
+    }
+
 void Marklar::performExitSyncDialog(void) {
     QMessageBox box;
+    box.setWindowTitle("Выход");
     box.setIcon(QMessageBox::Question);
     box.setText("Выход из Marklar");
     box.setInformativeText("Произвести сохранение перед выходом?");

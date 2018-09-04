@@ -2,6 +2,7 @@
 <RCC version="1.0">
     <qresource>
         <file>icon.png</file>
+        <file>LICENSE</file>
 
         <file>idle.png</file>
         <file>active.png</file>
