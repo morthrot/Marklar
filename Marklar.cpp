@@ -70,7 +70,7 @@ Marklar::Marklar(const QString & source_path,const QString & target_path,const i
     _menu->addAction("Показать архив",this,SLOT(browseTargetPath()));
     _menu->addAction("Архивировать сейчас",this,SLOT(keepAlive()));
     _menu->addSeparator();
-    _menu->addAction("Выход",qApp,SLOT(quit()));
+    _menu->addAction("Выход...",this,SLOT(performExitSyncDialog()));
 
     _tray = new QSystemTrayIcon(this);
     _tray->setIcon(_icon_map.value(TrayIdle));
@@ -191,6 +191,25 @@ bool Marklar::keepAlive(void) {
 
     trayIcon(TrayIdle);
     return true;
+    }
+
+void Marklar::performExitSyncDialog(void) {
+    QMessageBox box;
+    box.setIcon(QMessageBox::Question);
+    box.setText("Выход из Marklar");
+    box.setInformativeText("Произвести сохранение перед выходом?");
+    box.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+    box.setDefaultButton(QMessageBox::Yes);
+
+    int result = box.exec();
+    if(result == QMessageBox::Cancel) { return; }
+
+    if(result == QMessageBox::Yes) {
+        bool save_ok = keepAlive();
+        if(save_ok == false) { return; }
+        }
+
+    qApp->quit();
     }
 
 void Marklar::trayMessage(const QString & text,bool fatal) {

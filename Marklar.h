@@ -68,6 +68,8 @@ public slots:
     void browseTargetPath(void);
     bool keepAlive(void);
 
+    void performExitSyncDialog(void);
+
     void trayMessage(const QString & text,bool fatal = false);
     void trayIcon(const TrayIcon & icon);
     };

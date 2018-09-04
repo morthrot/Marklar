@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
 #ifdef AM_USING_QT4
     QTextCodec::setCodecForCStrings( QTextCodec::codecForName("UTF-8") );
 #endif
+    app.setQuitOnLastWindowClosed(false);
     app.setWindowIcon(QIcon(":/icon.png"));
 
     QStringList args = app.arguments();
