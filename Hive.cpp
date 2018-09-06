@@ -118,10 +118,10 @@ void Hive::clear(void) {
 bool Hive::appendFolderToHive(QString base_name,QString folder_name) {
     if(base_name.isEmpty() == true) { return false; }
 
-    if(matchException(folder_name) == true) { return true; }
-
     if(base_name.endsWith('/') == false) { base_name = base_name.append('/'); }
     if(folder_name.isEmpty() == false && folder_name.endsWith('/') == false) { folder_name = folder_name.append('/'); }
+
+    if(matchException(folder_name) == true) { return true; }
 
     QString full_name = base_name + folder_name;
 

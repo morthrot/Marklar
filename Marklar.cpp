@@ -166,7 +166,7 @@ void Marklar::performAboutDialog(void) {
     box.setWindowTitle("О программе");
     box.setIcon(QMessageBox::Information);
     box.setText("Программа резервного копирования <b>\"Marklar\"</b>");
-    box.setInformativeText("Copyright (c) 2018 Д.С. Андреев");
+    box.setInformativeText("Copyright &copy; 2018 Д.С. Андреев");
 
     QFile license_file(":/LICENSE");
     if(license_file.open(QIODevice::ReadOnly) == true) {
