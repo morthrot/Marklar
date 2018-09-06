@@ -166,7 +166,7 @@ void Marklar::performAboutDialog(void) {
     box.setWindowTitle("О программе");
     box.setIcon(QMessageBox::Information);
     box.setText("Программа резервного копирования <b>\"Marklar\"</b>");
-    box.setInformativeText("Copyright &copy; 2018 Д.С. Андреев");
+    box.setInformativeText("Copyright (c) 2018 Д.С. Андреев");
 
     QFile license_file(":/LICENSE");
     if(license_file.open(QIODevice::ReadOnly) == true) {
@@ -182,7 +182,7 @@ void Marklar::performExitSyncDialog(void) {
     box.setWindowTitle("Выход");
     box.setIcon(QMessageBox::Question);
     box.setText("Выход из Marklar");
-    box.setInformativeText("Произвести сохранение перед выходом?");
+    box.setInformativeText("Произвести архивирование перед выходом?");
     box.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
     box.setDefaultButton(QMessageBox::Yes);
 
